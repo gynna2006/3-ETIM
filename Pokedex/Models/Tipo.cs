@@ -4,8 +4,6 @@ namespace Pokedex.Models
     {
         // Atributos
         public string Nome { get; set; }
-        
         public string Cor { get; set; }
-
     }
 }
