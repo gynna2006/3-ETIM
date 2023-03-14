@@ -2,36 +2,34 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Pokedex.Models;
+using Pokedex.Services;
 
 namespace Pokedex.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly IPokeService _pokeService;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, IPokeService pokeService)
     {
         _logger = logger;
+        _pokeService = pokeService;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(string tipo)
     {
-            var tipos = JsonSerializer.Deserialize<List<Tipo>>(LerArquivo(@"Data\tipos.json")
-            );
-            ViewData["Tipos"] = tipos;
-            var pokemons = JsonSerializer.Deserialize<List<Pokemon>>(LerArquivo(@"Data\pokemons.json")
-            );
-            return View(pokemons);
+        var pokes = _pokeService.GetPokedexDto();
+        ViewData["filter"] = string.IsNullOrEmpty(tipo) ? "all" : tipo;
+        return View(pokes);
     }
 
-    private string LerArquivo(string nomeArquivo)
+    public IActionResult Details(int Numero)
     {
-        using (StreamReader leitor = new StreamReader(nomeArquivo))
-        {
-            string dados = leitor.ReadToEnd();
-            return dados;
-        }
+        var pokemon = _pokeService.GetDetailedPokemon(Numero);
+        return View(pokemon);
     }
+
     public IActionResult Privacy()
     {
         return View();
